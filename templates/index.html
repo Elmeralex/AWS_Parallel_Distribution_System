@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TMEAS Distributed Store</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .product-card { transition: transform 0.3s; border: none; }
+        .product-card:hover { transform: translateY(-5px); }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">TMEAS TECH</a>
+            <div class="ms-auto text-light">
+                {% if user %}
+                    <span class="me-3 small">Logged in: <strong>{{ user.email }}</strong></span>
+                    <a href="/logout" class="btn btn-outline-light btn-sm">Logout</a>
+                {% else %}
+                    <a href="/login" class="btn btn-primary btn-sm px-4">Login</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-5">
+                
+                <div class="card product-card shadow-lg rounded-4 overflow-hidden">
+                    <img src="https://img.freepik.com/free-photo/laptop-near-cacti_23-2147768832.jpg?semt=ais_hybrid&w=740&q=80" 
+                         class="card-img-top" alt="Laptop">
+                    
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h2 class="card-title h4 fw-bold mb-0">Tech Laptop 2025</h2>
+                            <span class="badge bg-primary text-uppercase">Best Seller</span>
+                        </div>
+                        
+                        <p class="text-muted small mb-4">
+                            3-Tier Architecture Demo: Optimized for high-concurrency and shared data states.
+                        </p>
+
+                        <div class="bg-light p-3 rounded-3 mb-4 d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="text-secondary small d-block">Available Stock</span>
+                                <span class="h4 mb-0 fw-bold {% if stock|int > 0 %}text-success{% else %}text-danger{% endif %}">
+                                    {{ stock }} units
+                                </span>
+                            </div>
+                            <div class="text-end">
+                                <span class="text-secondary small d-block">Price</span>
+                                <span class="h4 mb-0 fw-bold text-dark">$999.00</span>
+                            </div>
+                        </div>
+
+                        {% if user %}
+                        <form action="/buy" method="POST">
+                            <button type="submit" class="btn btn-warning btn-lg w-100 fw-bold py-3 shadow-sm" 
+                                    {% if stock|int <= 0 %}disabled{% endif %}>
+                                {% if stock|int > 0 %}PROCEED TO BUY{% else %}OUT OF STOCK{% endif %}
+                            </button>
+                        </form>
+                        {% else %}
+                        <div class="alert alert-warning text-center py-2 mb-0">
+                            Please <a href="/login" class="fw-bold">Login</a> to purchase.
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <p class="text-secondary extra-small" style="font-size: 0.75rem;">
+                        <i class="bi bi-cpu"></i> <strong>Logic Tier:</strong> WebServer-A <br>
+                        <i class="bi bi-database"></i> <strong>Data Tier:</strong> Shared Redis & RDS
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
