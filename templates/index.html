@@ -1,89 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TMEAS Distributed Store</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>TMEAS Distributed Shop</title>
     <style>
-        body { background-color: #f8f9fa; }
-        .product-card { transition: transform 0.3s; border: none; }
-        .product-card:hover { transform: translateY(-5px); }
+        body { font-family: Arial, sans-serif; background: #f4f4f4; text-align: center; padding: 20px; }
+        .server-badge { background: #ff9900; color: white; padding: 5px 10px; border-radius: 5px; font-size: 0.8em; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; max-width: 1000px; margin: 40px auto; }
+        .product-card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .product-card img { max-width: 100%; height: 180px; object-fit: contain; }
+        .price { font-weight: bold; color: #B12704; font-size: 1.2em; }
+        .stock { color: #555; font-size: 0.9em; margin: 10px 0; }
+        .buy-btn { background: #ffd814; border: 1px solid #a88734; padding: 10px 20px; border-radius: 5px; cursor: pointer; width: 100%; }
+        .buy-btn:disabled { background: #ccc; cursor: not-allowed; }
     </style>
 </head>
 <body>
+    <h1>TMEAS E-Commerce Shop</h1>
+    <p>Handled by: <span class="server-badge">{{ server }}</span></p>
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="/">TMEAS TECH</a>
-            <div class="ms-auto text-light">
-                {% if user %}
-                    <span class="me-3 small">Logged in: <strong>{{ user.email }}</strong></span>
-                    <a href="/logout" class="btn btn-outline-light btn-sm">Logout</a>
-                {% else %}
-                    <a href="/login" class="btn btn-primary btn-sm px-4">Login</a>
-                {% endif %}
-            </div>
+    {% if user %}
+        <p>Logged in as: <b>{{ user.email }}</b> | <a href="/logout">Logout</a></p>
+    {% else %}
+        <p>Please <a href="/login">Login</a> to purchase items.</p>
+    {% endif %}
+
+    <div class="grid">
+        {% for p in products %}
+        <div class="product-card">
+            <img src="{{ p.image_url }}" alt="{{ p.name }}">
+            <h3>{{ p.name }}</h3>
+            <p class="price">{{ p.price }}</p>
+            <p class="stock">Live Stock (Redis): <b>{{ p.display_stock }}</b></p>
+            
+            <form action="/buy/{{ p.id }}" method="post">
+                <button type="submit" class="buy-btn" {% if p.display_stock|int <= 0 %}disabled{% endif %}>
+                    {% if p.display_stock|int <= 0 %}Sold Out{% else %}Buy Now{% endif %}
+                </button>
+            </form>
         </div>
-    </nav>
-
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-5">
-                
-                <div class="card product-card shadow-lg rounded-4 overflow-hidden">
-                    <img src="https://img.freepik.com/free-photo/laptop-near-cacti_23-2147768832.jpg?semt=ais_hybrid&w=740&q=80" 
-                         class="card-img-top" alt="Laptop">
-                    
-                    <div class="card-body p-4">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <h2 class="card-title h4 fw-bold mb-0">Tech Laptop 2025</h2>
-                            <span class="badge bg-primary text-uppercase">Best Seller</span>
-                        </div>
-                        
-                        <p class="text-muted small mb-4">
-                            3-Tier Architecture Demo: Optimized for high-concurrency and shared data states.
-                        </p>
-
-                        <div class="bg-light p-3 rounded-3 mb-4 d-flex justify-content-between align-items-center">
-                            <div>
-                                <span class="text-secondary small d-block">Available Stock</span>
-                                <span class="h4 mb-0 fw-bold {% if stock|int > 0 %}text-success{% else %}text-danger{% endif %}">
-                                    {{ stock }} units
-                                </span>
-                            </div>
-                            <div class="text-end">
-                                <span class="text-secondary small d-block">Price</span>
-                                <span class="h4 mb-0 fw-bold text-dark">$999.00</span>
-                            </div>
-                        </div>
-
-                        {% if user %}
-                        <form action="/buy" method="POST">
-                            <button type="submit" class="btn btn-warning btn-lg w-100 fw-bold py-3 shadow-sm" 
-                                    {% if stock|int <= 0 %}disabled{% endif %}>
-                                {% if stock|int > 0 %}PROCEED TO BUY{% else %}OUT OF STOCK{% endif %}
-                            </button>
-                        </form>
-                        {% else %}
-                        <div class="alert alert-warning text-center py-2 mb-0">
-                            Please <a href="/login" class="fw-bold">Login</a> to purchase.
-                        </div>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="text-center mt-4">
-                    <p class="text-secondary extra-small" style="font-size: 0.75rem;">
-                        <i class="bi bi-cpu"></i> <strong>Logic Tier:</strong> WebServer-A <br>
-                        <i class="bi bi-database"></i> <strong>Data Tier:</strong> Shared Redis & RDS
-                    </p>
-                </div>
-
-            </div>
-        </div>
+        {% endfor %}
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
